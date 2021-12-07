@@ -1,8 +1,4 @@
 import os
-# import tempfile
-# from owslib.wcs import WebCoverageService
-# https://pypi.org/project/geotiff/
-# from geotiff import GeoTiff
 import xarray as xr 
 from ftplib import FTP
 import sys
@@ -23,11 +19,14 @@ import matplotlib.patches as mpatches
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from pandas.tseries.frequencies import to_offset
 import argparse
+import a1_data_thredds
+import a1_data_geoserver
 # import datetime
 
 # Get input from command line arguments
 
 parser = argparse.ArgumentParser(description = "Description for my parser")
+parser.add_argument("-p", "--pilot", help = "Set pilot area", required = True, default = "sado_estuary")
 parser.add_argument("-T", "--T0", help = "Set reference time", required = True, default = "2021-09-26")
 parser.add_argument("-lat", "--lati", help = "Latitude", required = True, default = "38.7229344")
 parser.add_argument("-lon", "--loni", help = "Longitude", required = True, default = "-9.0917642")
@@ -48,9 +47,10 @@ period = 3
 # loni = -9.0917642
 # lati =38.7229344
 
+print("pilot")
+print(argument.pilot)
+
 t_start_datetime = dt.datetime.strptime(str(t_start),"%Y-%m-%d")
-
-
 
 def is_dst(dttime,timeZone):
    aware_dt = timeZone.localize(dttime)
@@ -62,82 +62,12 @@ CORRECT_FOR_SUMMERTIME = is_dst(t_start_datetime,timeZone)
 dataRange = range(1,period)
 dataRangeData = range(0,period)	
 
-for pp in range(period):
+# Read data from THREDDS service
 
-	print(pp)
-
-	time = t_start_datetime + dt.timedelta(days=pp)
-
-	url_hydro = "http://thredds.maretec.org/thredds/dodsC/MOHID_WATER/TAGUSESTUARY_200M_1L_1H/FORECAST/" + time.strftime("%Y%m%d%H") + ".nc"
-	url_meteo = "http://thredds.maretec.org/thredds/dodsC/WRF/TAGUS_3KM_1L_1H/FORECAST/" + time.strftime("%Y%m%d%H") + ".nc"
-	print(url_hydro)
-	print(url_meteo)
-
-	if pp == 0:
-
-		hydro = xr.open_dataset(url_hydro)
-
-		ssh = hydro['ssh'].sel(lon=loni, lat=lati, method='nearest')
-		u = hydro['u'].sel(lon=loni, lat=lati, depth=1, method='nearest')
-		v = hydro['v'].sel(lon=loni, lat=lati, depth=1, method='nearest')
-		vm = hydro['vm'].sel(lon=loni, lat=lati, depth=1, method='nearest')
-
-		meteo = xr.open_dataset(url_meteo)
-
-		air_temperature = meteo['air_temperature'].sel(lon=loni, lat=lati, method='nearest')
-		wind_modulus = meteo['wind_modulus'].sel(lon=loni, lat=lati, method='nearest')
-		x_wind = meteo['x_wind'].sel(lon=loni, lat=lati, method='nearest')
-		y_wind = meteo['y_wind'].sel(lon=loni, lat=lati, method='nearest')	
-
-	if pp != 0:
-
-		hydro = xr.open_dataset(url_hydro)
-
-		ssh = xr.concat([ssh, hydro['ssh'].sel(lon=loni, lat=lati, method='nearest')], dim="time")
-		u = xr.concat([u, hydro['u'].sel(lon=loni, lat=lati, depth=1, method='nearest')], dim="time")
-		v = xr.concat([v, hydro['v'].sel(lon=loni, lat=lati, depth=1, method='nearest')], dim="time")
-		vm = xr.concat([vm, hydro['vm'].sel(lon=loni, lat=lati, depth=1, method='nearest')], dim="time")
-
-		meteo = xr.open_dataset(url_meteo)
-
-		air_temperature = xr.concat([air_temperature, meteo['air_temperature'].sel(lon=loni, lat=lati, method='nearest')], dim="time")
-		wind_modulus = xr.concat([wind_modulus, meteo['wind_modulus'].sel(lon=loni, lat=lati, method='nearest')], dim="time")
-		x_wind = xr.concat([x_wind, meteo['x_wind'].sel(lon=loni, lat=lati, method='nearest')], dim="time")
-		y_wind = xr.concat([y_wind, meteo['y_wind'].sel(lon=loni, lat=lati, method='nearest')], dim="time")
-
-	## MAKE HYDRO DATAFRAME
-
-time_hydro = pd.Series(ssh.time.values, dtype="string")
-ssh = pd.Series(ssh[:].values, dtype="float")
-u = pd.Series(u[:].values, dtype="float")
-v = pd.Series(v[:].values, dtype="float")
-vm = pd.Series(vm[:].values, dtype="float")
-df_hydro = pd.concat([u,v,vm,ssh,time_hydro], axis=1)
-
-df_hydro.columns = ["velocity_U","velocity_V","velocity_modulus","water_level", "time"]
-df_hydro["time"] = pd.to_datetime(time_hydro, format='%Y-%m-%dT%H:00:00.000000000')
-df_hydro = df_hydro.set_index("time")
-
-df_hydro.to_csv('./output/hydro_combined.csv')
-
-## MAKE METEO DATAFRAME
-
-time_meteo = pd.Series(air_temperature.time.values, dtype="string")
-air_temperature = pd.Series(air_temperature[:].values, dtype="float")
-wind_modulus = pd.Series(wind_modulus[:].values, dtype="float")
-x_wind = pd.Series(x_wind[:].values, dtype="float")
-y_wind = pd.Series(y_wind[:].values, dtype="float")
-precip = pd.Series(np.zeros_like(y_wind[:].values), dtype="float")
-df_meteo = pd.concat([air_temperature,precip,wind_modulus,x_wind,y_wind,time_meteo], axis=1)
-
-df_meteo.columns = ["air_temperature","precipitation","wind_modulus","wind_velocity_X","wind_velocity_Y", "time"]
-df_meteo["time"] = pd.to_datetime(time_meteo, format='%Y-%m-%dT%H:00:00.000000000')
-df_meteo = df_meteo.set_index("time")
-
-df_meteo.to_csv('./output/meteo_combined.csv')
-
-all_data = df_hydro.join(df_meteo)
-all_data = all_data[~all_data.index.duplicated(keep='first')]
+if argument.pilot == "sado_estuary":
+	all_data=a1_data_thredds.a1_data_thredds(t_start_datetime,period,dt,lati,loni)
+elif argument.pilot == "limford":
+	all_data=a1_data_geoserver.a1_data_geoserver_process(lati,loni,t_start,period)
 
 
 if CORRECT_FOR_SUMMERTIME:
@@ -407,7 +337,7 @@ for row in range(nsubplots):
 		plt.text(sunrise[nday]-dt.timedelta(minutes=0), maxPlot+1.3, sunrise[nday].strftime("%Hh%M"), \
 				 fontsize=26, c="000000", ha='center', va='center')
 		sun_noon = sunrise[nday] + (sunset[nday]-sunrise[nday])/2
-		weekday = sunrise[nday].strftime("%a %d/%m").replace("Mon", "Segunda").replace("Tue","Terça").replace("Wed","Quarta").replace("Thu","Quinta").replace("Fri","Sexta").replace("Sat","Sábado").replace("Sun","Domingo")
+		weekday = sunrise[nday].strftime("%a %d/%m").replace("Mon", "Monday").replace("Tue","Tuesday").replace("Wed","Wednesday").replace("Thu","Thursday").replace("Fri","Friday").replace("Sat","Saturday").replace("Sun","Sunday")
 		plt.text(sun_noon-dt.timedelta(minutes=0), maxPlot+1.8, \
 				 weekday, \
 				 fontsize=26, c="000000",zorder=1000, ha='center', va='center')

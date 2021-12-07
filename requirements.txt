@@ -5,3 +5,5 @@ pillow
 requests
 matplotlib
 netcdf4
+rasterio
+owslib

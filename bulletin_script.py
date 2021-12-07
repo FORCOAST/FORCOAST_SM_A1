@@ -51,4 +51,4 @@ draw.text(((img_logo_new_Width + 510, img_logo_new_Height / 2.6)), ('MARINE COND
 draw.text((img_bulletin_Width - 400, img_logo_new_Height - 200 ), ('Bulletin generated on: ' + filecreated), font=font_2,fill=(0,0,0,255))
 
 
-newImg.save('./output/forcoast_a1_bulletin.png', quality = 95)
+newImg.save('./output/bulletin.png', quality = 95)

@@ -1,5 +1,8 @@
 #!/bin/bash
-# Example: run.sh -T 2021-07-13 -p 1 -d /data
+# Example: python forcoast_sm_a1.py -p sado_estuary -T 2021-09-26 -lat 38.7229344 -lon -9.0917642 -lim 2
+# Example: python forcoast_sm_a1.py -p limford -T 2021-11-26 -lat 56.9404 -lon 9.0434 -lim 1
+
+
 
 INITIAL_DIR="$(pwd)"
 
@@ -12,7 +15,7 @@ cd /usr/src/app
 python forcoast_sm_a1.py -T $1 -lat $2 -lon $3 -lim $4
 python bulletin_script.py
 
-cp /usr/src/app/output/forcoast_a1_bulletin.png $INITIAL_DIR
+cp /usr/src/app/output/bulletin.png $INITIAL_DIR
 
 exit 0
 
