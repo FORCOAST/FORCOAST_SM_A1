@@ -19,5 +19,5 @@ COPY ["*.sh", "/usr/src/app"]
 
 RUN chmod 755 /usr/src/app/run.sh
 
-ENTRYPOINT ["bash", "-c"]
-# ENTRYPOINT ["/usr/src/app/run.sh"]
+# ENTRYPOINT ["bash", "-c"]
+ENTRYPOINT ["/usr/src/app/run.sh"]

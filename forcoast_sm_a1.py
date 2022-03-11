@@ -66,7 +66,7 @@ dataRangeData = range(0,period)
 
 if argument.pilot == "sado_estuary":
 	all_data=a1_data_thredds.a1_data_thredds(t_start_datetime,period,dt,lati,loni)
-elif argument.pilot == "limford":
+elif argument.pilot == "limfjord":
 	all_data=a1_data_geoserver.a1_data_geoserver_process(lati,loni,t_start,period)
 
 
