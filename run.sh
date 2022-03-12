@@ -1,8 +1,8 @@
 #!/bin/bash
 # Example: python forcoast_sm_a1.py -p sado_estuary -T 2021-12-04 -lat 38.7229344 -lon -9.0917642 -lim 2
 # Example: python forcoast_sm_a1.py -p limford -T 2021-11-26 -lat 56.9404 -lon 9.0434 -lim 1
-# Example: ./run.sh sado_estuary 2021-12-04 38.7229344 -9.0917642 2 5254306289:AAGpuA1pbEGo0AZwiMGNacrsUXF1A6VY41s
-# Example: ./run.sh limfjord 2021-11-26 56.9404 9.0434 1 5254306289:AAGpuA1pbEGo0AZwiMGNacrsUXF1A6VY41s
+# Example: ./run.sh sado_estuary 2021-12-04 38.7229344 -9.0917642 2 5267228188:AAGx60FtWgHkScBb3ISFL1dp6Oq_9z9z0rw -1001299880558
+# Example: ./run.sh limfjord 2021-11-26 56.9404 9.0434 1 5267228188:AAGx60FtWgHkScBb3ISFL1dp6Oq_9z9z0rw -1001299880558
 
 INITIAL_DIR="$(pwd)"
 
@@ -17,8 +17,8 @@ python bulletin_script.py
 
 cp /usr/src/app/output/bulletin.png $INITIAL_DIR
 
-echo "python send_bulletin.py -T $1 -B $2 -M file"
-python send_bulletin.py -T $6 -B /usr/src/app/output/bulletin.png -M file
+echo "python send_bulletin.py -T $6 -C $7-B /usr/src/app/output/bulletin.png -M file"
+python send_bulletin.py -T $6 -C $7 -B /usr/src/app/output/bulletin.png -M file
 
 exit 0
 
