@@ -20,6 +20,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from pandas.tseries.frequencies import to_offset
 import argparse
 import a1_data_thredds
+from matplotlib.ticker import FormatStrFormatter
 import a1_data_geoserver
 # import datetime
 
@@ -181,8 +182,10 @@ tidePlot = plt.figure(figsize=(30,7))
 
 for row in range(nsubplots):
 	  
-	maxPlot = 5#max(maxTides) + 0.1*(max(maxTides)-min(minTides))
-	minPlot = -1#min(minTides) - (max(maxTides)-min(minTides))
+	maxPlot = max(maxTides) + .9*(max(maxTides)-min(minTides))
+	minPlot = min(minTides) - .9*(max(maxTides)-min(minTides))
+	plotRange = maxPlot - minPlot
+	positionMultiplication = 2
 	
 	plt.subplot(nsubplots,1,row+1)
 	dateInitial = (t_start_datetime+dt.timedelta(days=dataRange[(row)*2])).strftime("%Y-%m-%d")  
@@ -198,27 +201,27 @@ for row in range(nsubplots):
 		axins.imshow(im)
 		axins.axis("off")
 		
-		plt.text(start_plot+dt.timedelta(hours=1), maxPlot+3.1, \
+		plt.text(start_plot+dt.timedelta(hours=1), plotRange/positionMultiplication, \
 				 "Night tide", fontsize=20, c=GREEN, zorder=200, ha='left',clip_on=False , va='center')
-		plt.text(start_plot+dt.timedelta(hours=7), maxPlot+3.1, \
+		plt.text(start_plot+dt.timedelta(hours=7), maxPlot+plotRange/positionMultiplication, \
 				 "Optimal tide", fontsize=20, c= BLUE  , zorder=200,clip_on=False, ha='left', va='center')
-		plt.text(start_plot+dt.timedelta(hours=13), maxPlot+3.1, \
+		plt.text(start_plot+dt.timedelta(hours=13), maxPlot+plotRange/positionMultiplication, \
 				 "Work Threshold", fontsize=20, c="#ff0000", \
 				 clip_on=False,zorder=200, ha='left', va='center')
-		plt.axhline(y = maxPlot+2.8, xmin=pos_from_time(start_plot+dt.timedelta(hours=0.1),0),   \
+		plt.axhline(y = maxPlot+plotRange/positionMultiplication-plotRange/20, xmin=pos_from_time(start_plot+dt.timedelta(hours=0.1),0),   \
 					xmax=pos_from_time(start_plot+dt.timedelta(hours=5),0), \
 					color=GREEN,zorder=5000, linewidth=3,clip_on=False )
 		
-		plt.axhline(y = maxPlot+2.8, xmin=pos_from_time(start_plot+dt.timedelta(hours=6),0),   \
+		plt.axhline(y = maxPlot+plotRange/positionMultiplication-plotRange/20, xmin=pos_from_time(start_plot+dt.timedelta(hours=6),0),   \
 					xmax=pos_from_time(start_plot+dt.timedelta(hours=11),0), \
 					color=BLUE,zorder=5000, linewidth=3,clip_on=False )
-		plt.axhline(y = maxPlot+2.8, xmin=pos_from_time(start_plot+dt.timedelta(hours=12),0),   \
+		plt.axhline(y = maxPlot+plotRange/positionMultiplication-plotRange/20, xmin=pos_from_time(start_plot+dt.timedelta(hours=12),0),   \
 					xmax=pos_from_time(start_plot+dt.timedelta(hours=23),0), \
 					color="#ff0000",zorder=5000, linewidth=3,clip_on=False )
 
 		position_text = str(round(lati, 3)) + "N, " + str(round(loni, 3)) + "W"		
 		
-		plt.text(start_plot+dt.timedelta(hours=26), maxPlot+3.1, \
+		plt.text(start_plot+dt.timedelta(hours=26), maxPlot+plotRange/positionMultiplication+plotRange/60, \
 				 position_text, fontsize=20, fontweight="bold",c="#000000", zorder=200, ha='left',clip_on=False , va='center')
 	
 	plt.xlim([datetime.strptime(dateInitial + "T00:00", '%Y-%m-%dT%H:%M'), datetime.strptime(dateFinal + "T23:59", '%Y-%m-%dT%H:%M')])
@@ -231,7 +234,8 @@ for row in range(nsubplots):
 		line.set_data([-.025, 0])	
 	ax.yaxis.set_tick_params(width=4, length=30, color="#d3d3d3")
 	#plt.yticks(np.arange(0, tides.max(), step=1), fontsize=22)
-	plt.yticks(np.arange(0, 5, step=1), fontsize=22)
+	plt.yticks(np.arange(minPlot, maxPlot, step=plotRange/6), fontsize=22)
+	ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 	plt.ylabel("Water level (m)", loc='top', fontsize = 22,rotation=0)
 
 	# X-AXIS
@@ -247,18 +251,17 @@ for row in range(nsubplots):
 	plt.ylim([minPlot, maxPlot])
 	
 	print(start_plot)
-	plt.text(start_plot-dt.timedelta(hours=4), -2.6, \
+	plt.text(start_plot-dt.timedelta(hours=4), minPlot-plotRange/3.2,\
 				 "Wind\n (km/h)", fontsize=22, c="000000", zorder=200, ha='center', va='center')
-	plt.text(start_plot-dt.timedelta(hours=4), -3.4, \
+	plt.text(start_plot-dt.timedelta(hours=4), minPlot-plotRange/3.2*1.5, \
 				 "Precipitation\n (mm/h)", fontsize=22, c="000000", zorder=200, ha='center', va='center')
-	plt.text(start_plot-dt.timedelta(hours=4), -1.8, \
+	plt.text(start_plot-dt.timedelta(hours=4), minPlot-plotRange/7, \
 			 "Time", fontsize=22, c="000000", zorder=200, ha='center', va='center')
 	plt.text(start_plot-dt.timedelta(hours=0),\
-				 TIDETHRESHOLD+.2, "lim= " + str(TIDETHRESHOLD) + "m", fontsize=20, c="#ff0000",zorder=1000, ha='left', va='center')
-	
+			 TIDETHRESHOLD+plotRange/20, "lim= {}m".format(TIDETHRESHOLD), fontsize=20, c="#ff0000",zorder=1000, ha='left', va='center')
+
 	ax.add_patch(matplotlib.patches.Rectangle((start_plot, TIDETHRESHOLD), \
-							dt.timedelta(hours=48), maxPlot-TIDETHRESHOLD, 
-								fc = "#ffffff", lw = 10,alpha=0.75,zorder=10))
+			 dt.timedelta(hours=48), maxPlot-TIDETHRESHOLD, fc = "#ffffff", lw = 10,alpha=0.75,zorder=10))
 	
 	for idx_day,day in enumerate(dataRange[(row)*2:(row)*2+2]):
 		
@@ -314,10 +317,10 @@ for row in range(nsubplots):
 		workingSpots = dayTimes[np.argwhere(np.diff(np.sign(daytimeTides - TIDETHRESHOLD))).flatten()]
 		
 		for spot in workingSpots:
-			plt.text(spot-dt.timedelta(minutes=0), (-0.5+minPlot)/(maxPlot-minPlot), spot.strftime("%Hh%M"),\
-				 fontsize=26,  c="#ff0000", ha='center', va='center',zorder=3000)
-			plt.axvline(x=spot, ymin=(-minPlot)/(maxPlot-minPlot), \
-						ymax=(1.9-minPlot)/(maxPlot-minPlot), color="#ff0000", ls="--", zorder=200)
+			plt.text(spot-dt.timedelta(minutes=0), minPlot+plotRange/10, spot.strftime("%Hh%M"),\
+				fontsize=26,  c="#ff0000", ha='center', va='center',zorder=3000)
+			plt.axvline(x=spot, ymin=0.12, \
+				ymax=(TIDETHRESHOLD-minPlot)/(maxPlot-minPlot), color="#ff0000", ls="--", zorder=200)
 		
 		
 		
@@ -328,27 +331,27 @@ for row in range(nsubplots):
 		im = plt.imread(os.path.join(os.getcwd(), "icons","sunset.png"))
 		axins.imshow(im)
 		axins.axis("off")
-		plt.text(sunset[nday]-dt.timedelta(minutes=0), maxPlot+1.3, sunset[nday].strftime("%Hh%M"),\
+		plt.text(sunset[nday]-dt.timedelta(minutes=0), maxPlot+plotRange/positionMultiplication/2, sunset[nday].strftime("%Hh%M"),\
 				 fontsize=26,  c="000000", ha='center', va='center')
 		axins = ax.inset_axes([pos_from_time(sunrise[nday],idx_day)-0.05, 1 , y_scale_im, .2])
 		im = plt.imread(os.path.join(os.getcwd(), "icons","sunrise.png"))
 		axins.imshow(im)
 		axins.axis("off")
-		plt.text(sunrise[nday]-dt.timedelta(minutes=0), maxPlot+1.3, sunrise[nday].strftime("%Hh%M"), \
+		plt.text(sunrise[nday]-dt.timedelta(minutes=0), maxPlot+plotRange/positionMultiplication/2, sunrise[nday].strftime("%Hh%M"), \
 				 fontsize=26, c="000000", ha='center', va='center')
 		sun_noon = sunrise[nday] + (sunset[nday]-sunrise[nday])/2
 		weekday = sunrise[nday].strftime("%a %d/%m").replace("Mon", "Monday").replace("Tue","Tuesday").replace("Wed","Wednesday").replace("Thu","Thursday").replace("Fri","Friday").replace("Sat","Saturday").replace("Sun","Sunday")
-		plt.text(sun_noon-dt.timedelta(minutes=0), maxPlot+1.8, \
+		plt.text(sun_noon-dt.timedelta(minutes=0), maxPlot+plotRange/positionMultiplication-plotRange/positionMultiplication/3, \
 				 weekday, \
 				 fontsize=26, c="000000",zorder=1000, ha='center', va='center')
 		
 		
 		
 		start = datetime.strptime(date + "T00:00", '%Y-%m-%dT%H:%M')
-		plt.axhline(y = maxPlot+1.8, xmin=pos_from_time(start+dt.timedelta(hours=.05),idx_day)-0.02,   \
+		plt.axhline(y = maxPlot+plotRange/positionMultiplication-plotRange/positionMultiplication/3, xmin=pos_from_time(start+dt.timedelta(hours=.05),idx_day)-0.02,   \
 					xmax=pos_from_time(start+dt.timedelta(hours=8),idx_day), \
 					color="#7E7E7E",zorder=5000, linewidth=3,clip_on=False )
-		plt.axhline(y = maxPlot+1.8, xmin=pos_from_time(start+dt.timedelta(hours=16),idx_day),\
+		plt.axhline(y = maxPlot+plotRange/positionMultiplication-plotRange/positionMultiplication/3, xmin=pos_from_time(start+dt.timedelta(hours=16),idx_day),\
 					xmax=pos_from_time(start+dt.timedelta(hours=23),idx_day),\
 					color="#7E7E7E",zorder=5000, linewidth=3,clip_on=False )
 		
@@ -357,18 +360,18 @@ for row in range(nsubplots):
 		high_tides = maxTideTimes[(maxTideTimes>sunrise[nday]) & (maxTideTimes<sunset[nday])]
 		for idx_tide,high_tide in enumerate(high_tides):
 			high_tide_pos=pos_from_time(high_tide.to_pydatetime(),idx_day)-0.05
-			yimagepos=(TIDETHRESHOLD-1.3-minPlot)/(maxPlot-minPlot)
+			yimagepos=0.21#(TIDETHRESHOLD-plotRange/5-minPlot)/(maxPlot-minPlot)
 			axins = ax.inset_axes([high_tide_pos, yimagepos , y_scale_im, .2], zorder=200)
 			im = plt.imread(os.path.join(os.getcwd(), "icons","high_tide.png"))
 			axins.imshow(im)
 			axins.axis("off")
 			high_tide_time = maxTideTimes[(maxTideTimes>sunrise[nday]) & (maxTideTimes<sunset[nday])][idx_tide].to_pydatetime()
-			plt.axvline(x=high_tide_time, ymin=yimagepos+.3/maxPlot, \
+			plt.axvline(x=high_tide_time, ymin=yimagepos, \
 						ymax=maxTides[(maxTideTimes>sunrise[nday]) & (maxTideTimes<sunset[nday])][idx_tide]/maxPlot, color=BLUE, ls="--", zorder=200)
-			plt.text(high_tide_time-dt.timedelta(minutes=0),0.4 ,\
-					 maxTideTimes[(maxTideTimes>sunrise[nday]) & (maxTideTimes<sunset[nday])][idx_tide].to_pydatetime().strftime("%Hh%M"),\
+			plt.text(high_tide_time-dt.timedelta(minutes=0),minPlot + plotRange/6 ,\
+			maxTideTimes[(maxTideTimes>sunrise[nday]) & (maxTideTimes<sunset[nday])][idx_tide].to_pydatetime().strftime("%Hh%M"),\
 					 fontsize=28, c="000000", zorder=200, ha='center', va='center')
-			plt.text(high_tide_time-dt.timedelta(minutes=0), 0.0, \
+			plt.text(high_tide_time-dt.timedelta(minutes=0), minPlot + plotRange/10, \
 					 "{:.1f} m".format(maxTides[(maxTideTimes>sunrise[nday]) & (maxTideTimes<sunset[nday])][idx_tide]), \
 					 fontsize=24, c="000000", zorder=200, ha='center', va='center')
 
@@ -376,7 +379,7 @@ for row in range(nsubplots):
 		for idx_tide,low_tide in enumerate(low_tides):
 			low_tide_pos = pos_from_time(minTideTimes[(minTideTimes>sunrise[nday]) & \
 									(minTideTimes<sunset[nday])][idx_tide].to_pydatetime(), idx_day)-0.05
-			yimagepos=(TIDETHRESHOLD+0.6-minPlot)/(maxPlot-minPlot)
+			yimagepos=0.63#(TIDETHRESHOLD+plotRange/10-minPlot)/(maxPlot-minPlot)
 			axins = ax.inset_axes([low_tide_pos, yimagepos , y_scale_im, .2], zorder=200)
 			
 			im = plt.imread(os.path.join(os.getcwd(), "icons","low_tide.png"))
@@ -386,18 +389,18 @@ for row in range(nsubplots):
 			plt.axvline(x=low_tide_time,\
 						ymin=(minTides[(minTideTimes>sunrise[nday]) & (minTideTimes<sunset[nday])][idx_tide]-minPlot)/(maxPlot-minPlot), \
 										ymax=yimagepos, color=BLUE, ls="--", zorder=200)
-			plt.text(low_tide_time-dt.timedelta(minutes=0), TIDETHRESHOLD+ 2.3, \
+			plt.text(low_tide_time-dt.timedelta(minutes=0), minPlot + 9.2*plotRange/10, \
 					 minTideTimes[(minTideTimes>sunrise[nday]) & (minTideTimes<sunset[nday])][idx_tide].to_pydatetime().strftime("%Hh%M"), \
 					 fontsize=28, c="000000", zorder=200, ha='center', va='center')
-			plt.text(low_tide_time-dt.timedelta(minutes=0), TIDETHRESHOLD+1.9, \
+			plt.text(low_tide_time-dt.timedelta(minutes=0), minPlot + 5.1*plotRange/6, \
 					 "{:.1f} m".format(minTides[(minTideTimes>sunrise[nday]) & (minTideTimes<sunset[nday])][idx_tide]),\
 					 fontsize=24, c="000000", zorder=200, ha='center', va='center')
 
 
 		## HOUR TICKS
 		for hour in range(0,24+1,3):
-			initial_y = -0.8/maxPlot
-			end_y = -0.7/maxPlot
+			initial_y = -0.16
+			end_y =-0.14
 			plt.axvline(x=start+dt.timedelta(hours=hour), ymin=initial_y, 
 					   ymax=(end_y+0.03), color="#000000", lw=4, zorder=200, clip_on=False)
 			if hour>0:
@@ -424,17 +427,17 @@ for row in range(nsubplots):
 		for index, row in grouped_all_data[mask].iterrows():
 			#print(index,row['wind_modulus'])
 		
-			y0 = -2.6
+			y0 = minPlot-plotRange/3.2
 			x0 = index
-			plt.text(x0-dt.timedelta(minutes=70), y0-0.2,
+			plt.text(x0-dt.timedelta(minutes=70), y0-plotRange/9/2,
 					 "{:.0f}".format(row['wind_modulus_kmh']) , fontsize=22, c="000000", zorder=500)
 			ax.add_patch(matplotlib.patches.Rectangle((x0-dt.timedelta(minutes=90),
-							y0-0.5/(nsubplots+0.2)), dt.timedelta(hours=3), 1/(nsubplots+0.4), 
+							y0-plotRange/9/(nsubplots+0.2)), dt.timedelta(hours=3), 1/(nsubplots+0.4)*plotRange/5, 
 							fc = get_color_patch_wind(row['wind_modulus_kmh']), lw = .5,alpha=1,zorder=400, clip_on=False,\
 													 edgecolor='#d3d3d3'))
-			y0_arrow = y0 -.05*(nsubplots*2)
+			y0_arrow = y0 -plotRange/25
 			x0_arrow = x0 + dt.timedelta(minutes=15) if len("{:.0f}".format(row['wind_modulus_kmh']))==1 else x0 + dt.timedelta(minutes=30)
-			scale_y = .5#.9/(nsubplots+.5)
+			scale_y = plotRange/11#.9/(nsubplots+.5)
 			
 			
 			arrow = mpatches.FancyArrowPatch((x0_arrow-np.cos(row['angle'])/2*dt.timedelta(minutes=60), \
@@ -444,11 +447,11 @@ for row in range(nsubplots):
 									 clip_on=False, zorder=500,mutation_scale=20, color="black")
 			ax.add_patch(arrow)
 			
-			y0 = -3.4
-			plt.text(x0-dt.timedelta(minutes=35), y0-0.2,
+			y0 =minPlot-plotRange/3.2*1.5
+			plt.text(x0-dt.timedelta(minutes=35), y0-plotRange/9/2,
 					 "{:.1f}".format(abs(row['precipitation'])) , fontsize=22, c="000000", zorder=500)
 			ax.add_patch(matplotlib.patches.Rectangle((x0-dt.timedelta(minutes=90),
-							y0-0.5/(nsubplots+0.2)), dt.timedelta(hours=3), 1/(nsubplots+0.4), 
+							y0-plotRange/9/(nsubplots+0.2)), dt.timedelta(hours=3), 1/(nsubplots+0.4)*plotRange/5, 
 							fc = get_color_patch_precipitation(row['precipitation']), lw = .5,alpha=1,\
 									zorder=400, clip_on=False, edgecolor='#d3d3d3'))
 		
