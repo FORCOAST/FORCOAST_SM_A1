@@ -22,6 +22,7 @@ import argparse
 import a1_data_thredds
 from matplotlib.ticker import FormatStrFormatter
 import a1_data_geoserver
+import math
 # import datetime
 
 # Get input from command line arguments
@@ -439,14 +440,14 @@ for row in range(nsubplots):
 			x0_arrow = x0 + dt.timedelta(minutes=15) if len("{:.0f}".format(row['wind_modulus_kmh']))==1 else x0 + dt.timedelta(minutes=30)
 			scale_y = plotRange/11#.9/(nsubplots+.5)
 			
-			
-			arrow = mpatches.FancyArrowPatch((x0_arrow-np.cos(row['angle'])/2*dt.timedelta(minutes=60), \
-											  y0_arrow-np.sin(row['angle'])/2*scale_y),
-											 (x0_arrow + np.cos(row['angle'])/2*dt.timedelta(minutes=60), 
-											  y0_arrow+ np.sin(row['angle'])/2*scale_y),\
-									 clip_on=False, zorder=500,mutation_scale=20, color="black")
-			ax.add_patch(arrow)
-			
+			if math.isnan(row['angle']) == False:
+				arrow = mpatches.FancyArrowPatch((x0_arrow-np.cos(row['angle'])/2*dt.timedelta(minutes=60), \
+												  y0_arrow-np.sin(row['angle'])/2*scale_y),
+												 (x0_arrow + np.cos(row['angle'])/2*dt.timedelta(minutes=60), 
+												  y0_arrow+ np.sin(row['angle'])/2*scale_y),\
+										 clip_on=False, zorder=500,mutation_scale=20, color="black")
+				ax.add_patch(arrow)
+				
 			y0 =minPlot-plotRange/3.2*1.5
 			plt.text(x0-dt.timedelta(minutes=35), y0-plotRange/9/2,
 					 "{:.1f}".format(abs(row['precipitation'])) , fontsize=22, c="000000", zorder=500)
