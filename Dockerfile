@@ -10,7 +10,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Folders
 RUN mkdir -p /usr/src/app/output
 COPY ["icons/", "/usr/src/app/icons"]
-COPY ["output/", "/usr/src/app/output"]
 
 # Files
 COPY ["*.py", "/usr/src/app"]
