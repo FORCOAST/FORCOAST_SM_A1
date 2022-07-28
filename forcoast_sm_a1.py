@@ -82,7 +82,7 @@ for day in dataRange:
 	print("day:")
 	print(day)
 	dateAPI = (t_start_datetime+dt.timedelta(days=day)).strftime("%Y-%m-%d")
-	resp = requests.get(f"https://api.sunrise-sunset.org/json?lat={lati}&lng={loni}&date={dateAPI}")
+	resp = requests.get(f"https://api.sunrise-sunset.org/json?lat={lati}&lng={loni}&date={dateAPI}", verify=False)
 	sunrise.append(datetime.strptime(dateAPI + 'T' +resp.json()["results"]["sunrise"], '%Y-%m-%dT%I:%M:%S %p'))
 	sunset.append(datetime.strptime(dateAPI + 'T'+ resp.json()["results"]["sunset"], '%Y-%m-%dT%I:%M:%S %p'))
 	
