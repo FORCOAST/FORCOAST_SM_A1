@@ -202,7 +202,7 @@ for row in range(nsubplots):
 		axins.imshow(im)
 		axins.axis("off")
 		
-		plt.text(start_plot+dt.timedelta(hours=1), plotRange/positionMultiplication, \
+		plt.text(start_plot+dt.timedelta(hours=1), maxPlot+plotRange/positionMultiplication, \
 				 "Night tide", fontsize=20, c=GREEN, zorder=200, ha='left',clip_on=False , va='center')
 		plt.text(start_plot+dt.timedelta(hours=7), maxPlot+plotRange/positionMultiplication, \
 				 "Optimal tide", fontsize=20, c= BLUE  , zorder=200,clip_on=False, ha='left', va='center')
