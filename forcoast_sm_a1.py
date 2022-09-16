@@ -182,9 +182,13 @@ tidePlot = plt.figure(figsize=(30,7))
 #tidePlot.subplots_adjust(hspace=1)
 
 for row in range(nsubplots):
-	  
+
 	maxPlot = max(maxTides) + .9*(max(maxTides)-min(minTides))
+	if TIDETHRESHOLD >= maxPlot:
+		maxPlot = TIDETHRESHOLD + max(maxTides) + .9*(max(maxTides)-min(minTides))
 	minPlot = min(minTides) - .9*(max(maxTides)-min(minTides))
+	if TIDETHRESHOLD <= minPlot:
+		minPlot = TIDETHRESHOLD - min(minTides) - .9*(max(maxTides)-min(minTides))
 	plotRange = maxPlot - minPlot
 	positionMultiplication = 2
 	
