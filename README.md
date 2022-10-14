@@ -7,7 +7,7 @@ This service forecasts the water level of a selected point of interest for up to
 ### How to run
 
 * Containerize contents in docker
-* Run the command Docker run forcoast/forcoast-sm-a1 <pilot> <date> <lat> <lon> <limit> <Telegram token> <Telegram chat_id>
+* Run the command Docker run forcoast/forcoast-sm-a1 &lt;pilot> &lt;date> &lt;lat> &lt;lon> &lt;limit> &lt;Telegram token> &lt;Telegram chat_id>
   * Where <pilot> is either "sado_estuary" or "Limfjord"
   * Where limit is preferably between 0 and 2
   * We use a Telegram bot for sendingh the bulletins through messaging services
