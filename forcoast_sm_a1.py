@@ -1,3 +1,19 @@
+#(C) Copyright FORCOAST H2020 project under Grant No. 870465. All rights reserved.
+
+# Copyright notice
+# --------------------------------------------------------------------
+#  Copyright 2022 Maretec
+#   Francisco Campuzano
+#
+#   campuzanofj.maretec@tecnico.ulisboa.pt
+#
+#    This work is licenced under a Creative Commons Attribution 4.0 
+#	 International License.
+#
+#
+#        https://creativecommons.org/licenses/by/4.0/
+# --------------------------------------------------------------------
+
 import os
 import xarray as xr 
 from ftplib import FTP

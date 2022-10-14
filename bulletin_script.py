@@ -1,3 +1,19 @@
+#(C) Copyright FORCOAST H2020 project under Grant No. 870465. All rights reserved.
+
+# Copyright notice
+# --------------------------------------------------------------------
+#  Copyright 2022 Deltares
+#   Luis Rodriguez Galvez
+#
+#   luis.rodriguez@deltares.nl
+#
+#    This work is licenced under a Creative Commons Attribution 4.0 
+#	 International License.
+#
+#
+#        https://creativecommons.org/licenses/by/4.0/
+# --------------------------------------------------------------------
+
 import PIL
 from PIL import Image, ImageDraw,ImageFont 
 import os
