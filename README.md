@@ -8,9 +8,9 @@ This service forecasts the water level of a selected point of interest for up to
 
 * Containerize contents in docker
 * Run the command Docker run forcoast/forcoast-sm-a1 <pilot> <date> <lat> <lon> <limit> <Telegram token> <Telegram chat_id>
-** Where <pilot> is either "sado_estuary" or "Limfjord"
-** Where limit is preferably between 0 and 2
-** We use a Telegram bot for sendingh the bulletins through messaging services
+  * Where <pilot> is either "sado_estuary" or "Limfjord"
+  * Where limit is preferably between 0 and 2
+  * We use a Telegram bot for sendingh the bulletins through messaging services
 * Example of use: Docker run forcoast/forcoast-sm-a1 sado_estuary 2022-06-24 38.7229344 -9.0917642 2 5267228188:AAGx60FtWgHkScBb3ISFL1dp6Oq_9z9z0rw -100129988055
 
 ### Licence
